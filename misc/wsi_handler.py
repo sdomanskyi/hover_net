@@ -116,6 +116,32 @@ class OpenSlideHandler(FileHandler):
         metadata = {}
 
         wsi_properties = self.file_ptr.properties
+        
+        wsi_properties = {openslide.PROPERTY_NAME_OBJECTIVE_POWER: "0", openslide.PROPERTY_NAME_MPP_X: "0", openslide.PROPERTY_NAME_MPP_Y: "0", openslide.PROPERTY_NAME_VENDOR: "generic-tiff"}
+        for key in wsi_properties.keys():
+            try:
+                wsi_properties.update({key: self.file_ptr.properties[key]})
+            except Exception as exception:
+                print("wsi_properties:", exception)
+        try:
+            wsi_properties.update({openslide.PROPERTY_NAME_OBJECTIVE_POWER: float(self.file_ptr.properties["tiff.DocumentName"])})
+        except:
+            pass
+        try:
+            wsi_properties.update({openslide.PROPERTY_NAME_MPP_X: float(self.file_ptr.properties["tiff.Make"])})
+        except:
+            pass
+        try:
+            wsi_properties.update({openslide.PROPERTY_NAME_MPP_Y: float(self.file_ptr.properties["tiff.Model"])})
+        except:
+            pass
+        try:
+            wsi_properties.update({openslide.PROPERTY_NAME_VENDOR: self.file_ptr.properties["tiff.Software"]})
+        except:
+            pass
+        wsi_properties.update({openslide.PROPERTY_NAME_OBJECTIVE_POWER: float(40)})
+        
+        
         level_0_magnification = wsi_properties[openslide.PROPERTY_NAME_OBJECTIVE_POWER]
         level_0_magnification = float(level_0_magnification)
 

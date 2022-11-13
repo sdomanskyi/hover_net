@@ -66,12 +66,18 @@ class InferManager(object):
         saved_state_dict = convert_pytorch_checkpoint(saved_state_dict)
 
         net.load_state_dict(saved_state_dict, strict=True)
-        net = torch.nn.DataParallel(net)
-        net = net.to("cuda")
+        net = torch.nn.DataParallel(net) #############################
+        
+        if self.device_mode == 'gpu':
+            net = net.to("cuda")
+        elif self.device_mode == 'cpu':
+            net = net.to("cpu")
+        else:
+            raise NotImplementedError
 
         module_lib = import_module("models.hovernet.run_desc")
         run_step = getattr(module_lib, "infer_step")
-        self.run_step = lambda input_batch: run_step(input_batch, net)
+        self.run_step = lambda input_batch: run_step(input_batch, net, device_mode = self.device_mode)
 
         module_lib = import_module("models.hovernet.post_proc")
         self.post_proc_func = getattr(module_lib, "process")

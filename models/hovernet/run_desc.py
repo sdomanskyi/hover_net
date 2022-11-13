@@ -168,12 +168,19 @@ def valid_step(batch_data, run_info):
 
 
 ####
-def infer_step(batch_data, model):
+def infer_step(batch_data, model, device_mode = 'gpu'):
 
     ####
     patch_imgs = batch_data
 
-    patch_imgs_gpu = patch_imgs.to("cuda").type(torch.float32)  # to NCHW
+    if device_mode == 'gpu':
+        patch_imgs_gpu = patch_imgs.to("cuda").type(torch.float32)
+    elif device_mode == 'cpu':
+        patch_imgs_gpu = patch_imgs.to("cpu").type(torch.float32)
+    else:
+        raise NotImplementedError
+            
+    #patch_imgs_gpu = patch_imgs.to("cuda").type(torch.float32)  # to NCHW
     patch_imgs_gpu = patch_imgs_gpu.permute(0, 3, 1, 2).contiguous()
 
     ####

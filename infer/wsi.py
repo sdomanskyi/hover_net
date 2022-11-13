@@ -272,7 +272,7 @@ class InferManager(base.InferManager):
             batch_size=self.batch_size,
             drop_last=False,
         )
-
+        
         pbar = tqdm.tqdm(
             desc=pbar_desc,
             leave=True,
@@ -293,8 +293,9 @@ class InferManager(base.InferManager):
             sample_info_list = np.split(sample_info_list, curr_batch_size, axis=0)
             sample_output_list = list(zip(sample_info_list, sample_output_list))
             accumulated_patch_output.extend(sample_output_list)
-            pbar.update()
+            #pbar.update()
         pbar.close()
+        
         return accumulated_patch_output
 
     def __select_valid_patches(self, patch_info_list, has_output_info=True):
@@ -510,6 +511,10 @@ class InferManager(base.InferManager):
                 "%s/thumb/%s.png" % (output_dir, wsi_name),
                 cv2.cvtColor(wsi_thumb_rgb, cv2.COLOR_RGB2BGR),
             )
+            
+        if self.save_mask_and_exit:
+            print('WARNING: Mask saved. Interrupting the workflow.')
+            return
 
         # * declare holder for output
         # create a memory-mapped .npy file with the predefined dimensions and dtype

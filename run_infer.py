@@ -20,6 +20,9 @@ Options:
   --nr_inference_workers=<n>  Number of workers during inference. [default: 8]
   --nr_post_proc_workers=<n>  Number of workers during post-processing. [default: 16]
   --batch_size=<n>            Batch size per 1 GPU. [default: 32]
+  --device_mode=<name>        cpu or gpu. [default: 'gpu']
+  --cpu_count=<n>             Number of CPU cores to use. [default: 1]
+  --save_mask_and_exit        Save mask and stop hovernet. [dafault: False]
 
 Two command mode are `tile` and `wsi` to enter corresponding inference mode
     tile  run the inference on tile
@@ -111,10 +114,19 @@ if __name__ == '__main__':
     
     args.pop('--version')
     gpu_list = args.pop('--gpu')
-    os.environ['CUDA_VISIBLE_DEVICES'] = gpu_list
-
-    nr_gpus = torch.cuda.device_count()
-    log_info('Detect #GPUS: %d' % nr_gpus)
+    
+    device_mode = args['--device_mode']
+    
+    if device_mode == 'gpu':
+        os.environ['CUDA_VISIBLE_DEVICES'] = gpu_list
+    
+        nr_gpus = torch.cuda.device_count()
+        log_info('Detect #GPUS: %d' % nr_gpus)
+    else:
+        os.environ['CUDA_VISIBLE_DEVICES'] = ""
+        cpu_count = int(args['--cpu_count'])
+        torch.set_num_threads(max(1, cpu_count-2))
+        log_info('Using CPU mode: %s cores' % cpu_count)
 
     args = {k.replace('--', '') : v for k, v in args.items()}
     sub_args = {k.replace('--', '') : v for k, v in sub_args.items()}
@@ -123,6 +135,10 @@ if __name__ == '__main__':
 
     nr_types = int(args['nr_types']) if int(args['nr_types']) > 0 else None
     method_args = {
+        'device_mode' : args['device_mode'],
+        'cpu_count' : args['cpu_count'],
+        'save_mask_and_exit' : args['save_mask_and_exit'],
+        
         'method' : {
             'model_args' : {
                 'nr_types'   : nr_types,
@@ -135,8 +151,19 @@ if __name__ == '__main__':
     }
 
     # ***
+    if args['device_mode'] == 'gpu':
+        batch_size = int(args['batch_size']) * nr_gpus
+    elif args['device_mode'] == 'cpu':
+        batch_size = int(args['batch_size'])
+    else:
+        raise NotImplementedError
+    
     run_args = {
-        'batch_size' : int(args['batch_size']) * nr_gpus,
+        'device_mode'  : args['device_mode'],
+        'cpu_count'  : int(args['cpu_count']),
+        'save_mask_and_exit' : args['save_mask_and_exit'],
+        
+        'batch_size' : batch_size,
 
         'nr_inference_workers' : int(args['nr_inference_workers']),
         'nr_post_proc_workers' : int(args['nr_post_proc_workers']),
