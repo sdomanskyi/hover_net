@@ -102,10 +102,11 @@ class FileHandler(object):
 class OpenSlideHandler(FileHandler):
     """Class for handling OpenSlide supported whole-slide images."""
 
-    def __init__(self, file_path):
+    def __init__(self, file_path, slide_magnification=None):
         """file_path (string): path to single whole-slide image."""
         super().__init__()
         self.file_ptr = openslide.OpenSlide(file_path)  # load OpenSlide object
+        self.slide_magnification = slide_magnification
         self.metadata = self.__load_metadata()
 
         # only used for cases where the read magnification is different from
@@ -115,32 +116,11 @@ class OpenSlideHandler(FileHandler):
     def __load_metadata(self):
         metadata = {}
 
-        wsi_properties = self.file_ptr.properties
-        
-        wsi_properties = {openslide.PROPERTY_NAME_OBJECTIVE_POWER: "0", openslide.PROPERTY_NAME_MPP_X: "0", openslide.PROPERTY_NAME_MPP_Y: "0", openslide.PROPERTY_NAME_VENDOR: "generic-tiff"}
-        for key in wsi_properties.keys():
-            try:
-                wsi_properties.update({key: self.file_ptr.properties[key]})
-            except Exception as exception:
-                print("wsi_properties:", exception)
-        try:
-            wsi_properties.update({openslide.PROPERTY_NAME_OBJECTIVE_POWER: float(self.file_ptr.properties["tiff.DocumentName"])})
-        except:
-            pass
-        try:
-            wsi_properties.update({openslide.PROPERTY_NAME_MPP_X: float(self.file_ptr.properties["tiff.Make"])})
-        except:
-            pass
-        try:
-            wsi_properties.update({openslide.PROPERTY_NAME_MPP_Y: float(self.file_ptr.properties["tiff.Model"])})
-        except:
-            pass
-        try:
-            wsi_properties.update({openslide.PROPERTY_NAME_VENDOR: self.file_ptr.properties["tiff.Software"]})
-        except:
-            pass
-        wsi_properties.update({openslide.PROPERTY_NAME_OBJECTIVE_POWER: float(40)})
-        
+        #wsi_properties = self.file_ptr.properties       
+        wsi_properties = {openslide.PROPERTY_NAME_OBJECTIVE_POWER: self.slide_magnification,
+                          openslide.PROPERTY_NAME_MPP_X: "0",
+                          openslide.PROPERTY_NAME_MPP_Y: "0",
+                          openslide.PROPERTY_NAME_VENDOR: "generic-tiff"}
         
         level_0_magnification = wsi_properties[openslide.PROPERTY_NAME_OBJECTIVE_POWER]
         level_0_magnification = float(level_0_magnification)
@@ -216,7 +196,7 @@ class OpenSlideHandler(FileHandler):
         return wsi_img
 
 
-def get_file_handler(path, backend):
+def get_file_handler(path, backend, slide_magnification=None):
     if backend in [
             '.svs', '.tif', 
             '.vms', '.vmu', '.ndpi',
@@ -224,7 +204,7 @@ def get_file_handler(path, backend):
             '.svslide',
             '.bif',
             ]:
-        return OpenSlideHandler(path)
+        return OpenSlideHandler(path, slide_magnification=slide_magnification)
     else:
         assert False, "Unknown WSI format `%s`" % backend
 

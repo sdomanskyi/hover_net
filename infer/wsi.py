@@ -468,7 +468,7 @@ class InferManager(base.InferManager):
         wsi_name = path_obj.stem
 
         start = time.perf_counter()
-        self.wsi_handler = get_file_handler(wsi_path, backend=wsi_ext)
+        self.wsi_handler = get_file_handler(wsi_path, backend=wsi_ext, slide_magnification=self.proc_mag)
         self.wsi_proc_shape = self.wsi_handler.get_dimensions(self.proc_mag)
         self.wsi_handler.prepare_reading(
             read_mag=self.proc_mag, cache_path="%s/src_wsi.npy" % self.cache_path
@@ -736,7 +736,8 @@ class InferManager(base.InferManager):
 
         wsi_path_list = glob.glob(self.input_dir + "/*")
         wsi_path_list.sort()  # ensure ordering
-        for wsi_path in wsi_path_list[:]:
+        #for wsi_path in wsi_path_list[:]:
+        for wsi_path in [self.input_dir]:
             wsi_base_name = pathlib.Path(wsi_path).stem
             msk_path = "%s/%s.png" % (self.input_mask_dir, wsi_base_name)
             if self.save_thumb or self.save_mask:

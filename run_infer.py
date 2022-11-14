@@ -138,6 +138,7 @@ if __name__ == '__main__':
         'device_mode' : args['device_mode'],
         'cpu_count' : args['cpu_count'],
         'save_mask_and_exit' : args['save_mask_and_exit'],
+        'proc_mag': int(sub_args['proc_mag']),
         
         'method' : {
             'model_args' : {
