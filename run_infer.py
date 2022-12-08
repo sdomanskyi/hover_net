@@ -54,7 +54,7 @@ wsi_cli = """
 Arguments for processing wsi
 
 usage:
-    wsi (--input_dir=<path>) (--output_dir=<path>) [--proc_mag=<n>]\
+    wsi (--input_dir=<path>) (--output_dir=<path>) [--proc_mag=<n>] [--slide_mag=<n>] \
         [--cache_path=<path>] [--input_mask_dir=<path>] \
         [--ambiguous_size=<n>] [--chunk_shape=<n>] [--tile_shape=<n>] \
         [--save_thumb] [--save_mask]
