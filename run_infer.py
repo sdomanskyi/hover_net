@@ -67,6 +67,7 @@ options:
                             Should have the same name as corresponding WSIs. [default: '']
 
     --proc_mag=<n>          Magnification level (objective power) used for WSI processing. [default: 40]
+    --slide_mag=<n>         Magnification level (objective power) of a WSI. [default: 40]
     --ambiguous_size=<int>  Define ambiguous region along tiling grid to perform re-post processing. [default: 128]
     --chunk_shape=<n>       Shape of chunk for processing. [default: 10000]
     --tile_shape=<n>        Shape of tiles for processing. [default: 2048]
@@ -138,7 +139,7 @@ if __name__ == '__main__':
         'device_mode' : args['device_mode'],
         'cpu_count' : args['cpu_count'],
         'save_mask_and_exit' : args['save_mask_and_exit'],
-        'proc_mag': int(sub_args['proc_mag']),
+        'slide_mag': int(sub_args['slide_mag']),
         
         'method' : {
             'model_args' : {
