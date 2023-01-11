@@ -139,7 +139,7 @@ if __name__ == '__main__':
         'device_mode' : args['device_mode'],
         'cpu_count' : args['cpu_count'],
         'save_mask_and_exit' : args['save_mask_and_exit'],
-        'slide_mag': int(sub_args['slide_mag']),
+        'slide_mag': int(sub_args['slide_mag']) if 'slide_mag' in sub_args.keys() else 40,
         
         'method' : {
             'model_args' : {
