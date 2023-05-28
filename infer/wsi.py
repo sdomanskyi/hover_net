@@ -753,5 +753,8 @@ class InferManager(base.InferManager):
                 log_info("Finish")
             except:
                 logging.exception("Crash")
-        rm_n_mkdir(self.cache_path)  # clean up all cache
+        try:
+            rm_n_mkdir(self.cache_path)  # clean up all cache
+        except Exception as exception:
+            print('Could not remove cache:', exception)
         return
