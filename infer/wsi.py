@@ -530,13 +530,14 @@ class InferManager(base.InferManager):
         )
         # self.wsi_inst_map[:] = 0 # flush fill
 
-        # warning, the value within this is uninitialized
-        self.wsi_pred_map = np.lib.format.open_memmap(
-            "%s/pred_map.npy" % self.cache_path,
-            mode="w+",
-            shape=tuple(self.wsi_proc_shape) + (out_ch,),
-            dtype=np.float32,
-        )
+        if self.run_prep_stage:
+            # warning, the value within this is uninitialized
+            self.wsi_pred_map = np.lib.format.open_memmap(
+                "%s/pred_map.npy" % self.cache_path,
+                mode="w+",
+                shape=tuple(self.wsi_proc_shape) + (out_ch,),
+                dtype=np.float32,
+            )
         # ! for debug
         # self.wsi_pred_map = np.load('%s/pred_map.npy' % self.cache_path, mmap_mode='r')
         end = time.perf_counter()
@@ -551,10 +552,14 @@ class InferManager(base.InferManager):
             patch_output_shape,
         )
 
-        # get the raw prediction of HoVer-Net, given info of inference tiles and patches
-        self.__get_raw_prediction(chunk_info_list, patch_info_list)
-        end = time.perf_counter()
-        log_info("Inference Time: {0}".format(end - start))
+        if self.run_prep_stage:
+            # get the raw prediction of HoVer-Net, given info of inference tiles and patches
+            self.__get_raw_prediction(chunk_info_list, patch_info_list)
+            end = time.perf_counter()
+            log_info("Inference Time: {0}".format(end - start))
+
+        if not self.run_post_stage:
+            return
 
         # TODO: deal with error banding
         ##### * post processing
@@ -721,6 +726,7 @@ class InferManager(base.InferManager):
         
         """
         self._parse_args(run_args)
+        print(run_args); print(self.run_prep_stage, self.run_post_stage); exit()
 
         if not os.path.exists(self.cache_path):
             rm_n_mkdir(self.cache_path)
@@ -754,7 +760,8 @@ class InferManager(base.InferManager):
             except:
                 logging.exception("Crash")
         try:
-            rm_n_mkdir(self.cache_path)  # clean up all cache
+            ...
+            #rm_n_mkdir(self.cache_path)  # clean up all cache
         except Exception as exception:
             print('Could not remove cache:', exception)
         return

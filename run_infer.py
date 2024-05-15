@@ -21,6 +21,8 @@ Options:
   --nr_post_proc_workers=<n>  Number of workers during post-processing. [default: 16]
   --batch_size=<n>            Batch size per 1 GPU. [default: 32]
   --device_mode=<name>        cpu or gpu. [default: 'gpu']
+  --run_prep_stage            Run preprocessing inference stage. [default: True]
+  --run_post_stage            Run preprocessing stage. [default: True]
   --cpu_count=<n>             Number of CPU cores to use. [default: 1]
   --save_mask_and_exit        Save mask and stop hovernet. [dafault: False]
 
@@ -139,6 +141,8 @@ if __name__ == '__main__':
         'device_mode' : args['device_mode'],
         'cpu_count' : args['cpu_count'],
         'save_mask_and_exit' : args['save_mask_and_exit'],
+        'run_prep_stage' : args['run_prep_stage'],
+        'run_post_stage' : args['run_post_stage'],
         'slide_mag': int(sub_args['slide_mag']) if 'slide_mag' in sub_args.keys() else 40,
         
         'method' : {
