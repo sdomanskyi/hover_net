@@ -726,7 +726,6 @@ class InferManager(base.InferManager):
         
         """
         self._parse_args(run_args)
-        print(run_args); print(self.run_prep_stage, self.run_post_stage); exit()
 
         if not os.path.exists(self.cache_path):
             rm_n_mkdir(self.cache_path)
